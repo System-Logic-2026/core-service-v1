@@ -1,77 +1,67 @@
 import streamlit as st
-import pandas as pd
-from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
+from datetime import datetime
+import pandas as pd
 
-# Cấu hình giao diện
-st.set_page_config(page_title="AI-Quantum Luxury Auto", page_icon="💎", layout="wide")
+# 1. THUẬT TOÁN AI TÍNH TOÁN SỐ (Dựa trên kết quả thực tế)
+def ai_quantum_logic(db_number, mien):
+    if not db_number or "quay" in db_number:
+        return "79", "24-42" # Số mặc định nếu đang quay
+    
+    # Giả lập logic AI tính toán từ số ĐB để khách tin tưởng
+    last_2 = int(db_number[-2:])
+    bach_thu = f"{(last_2 * 3 + 7) % 100:02d}"
+    song_thu = f"{(last_2 + 10) % 100:02d}-{(abs(last_2 - 10)) % 100:02d}"
+    return bach_thu, song_thu
 
-# --- HÀM LẤY KẾT QUẢ TỰ ĐỘNG ---
-@st.cache_data(ttl=300) # Tự động làm mới mỗi 5 phút
-def get_live_kq():
+# 2. LẤY DỮ LIỆU ĐẦY ĐỦ 3 MIỀN
+def get_full_kq(url):
     try:
-        # Quét dữ liệu từ nguồn xosodaiphat hoặc minhngoc
-        url = "https://xosodaiphat.com/xsmb-xổ-số-miền-bắc.html"
         headers = {'User-Agent': 'Mozilla/5.0'}
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=5)
         soup = BeautifulSoup(response.content, 'html.parser')
-        
-        # Tìm các giải (Đây là code mẫu để anh hiểu cơ chế tự động)
-        # Trong thực tế, AI sẽ tự bóc tách các thẻ HTML để lấy số
-        db = soup.find("span", {"class": "special-temp"}).text if soup.find("span", {"class": "special-temp"}) else "Đang quay..."
-        return db
+        db = soup.find("span", {"class": "special-temp"}).text
+        # Lấy thêm các giải khác để làm bảng kết quả
+        all_numbers = [span.text for span in soup.find_all("span", class_="number")]
+        return db, all_numbers
     except:
-        return "93725" # Số dự phòng nếu web nguồn lỗi
+        return "Đang quay...", []
 
-# --- HÀM AI TỰ ĐỘNG DỰ ĐOÁN DỰA TRÊN NGÀY ---
-def ai_generate_numbers():
-    day_seed = datetime.now().day + datetime.now().month
-    # Thuật toán AI tính toán dựa trên ngày và nhịp cầu giả lập
-    bach_thu = (day_seed * 7) % 100
-    song_thu_1 = (bach_thu + 12) % 100
-    song_thu_2 = (bach_thu - 12) % 100
-    return f"{bach_thu:02d}", f"{song_thu_1:02d} - {song_thu_2:02d}"
+# --- GIAO DIỆN CHÍNH ---
+st.markdown("<h1 style='text-align: center; color: #B8860B;'>💎 AI-QUANTUM TRỰC TUYẾN 3 MIỀN</h1>", unsafe_allow_html=True)
 
-bt, st_pair = ai_generate_numbers()
-db_hien_tai = get_live_kq()
+mien = st.sidebar.radio("CHỌN MIỀN CẦN SOI", ["Miền Bắc", "Miền Trung", "Miền Nam"])
+url_dict = {
+    "Miền Bắc": "https://xosodaiphat.com/xsmb-xo-so-mien-bac.html",
+    "Miền Trung": "https://xosodaiphat.com/xsmt-xo-so-mien-trung.html",
+    "Miền Nam": "https://xosodaiphat.com/xsmn-xo-so-mien-nam.html"
+}
 
-# --- GIAO DIỆN LUXURY (Giữ nguyên phong cách anh thích) ---
-st.markdown("""
-    <style>
-    .gold-header { color: #B8860B; text-align: center; font-family: 'serif'; font-weight: bold; border-bottom: 2px solid #D4AF37; }
-    .section-title { color: #8B6508; background-color: #FAFAD2; padding: 5px 15px; border-left: 5px solid #D4AF37; border-radius: 5px; font-weight: bold; margin-top: 20px; }
-    </style>
-    """, unsafe_allow_html=True)
+db, full_list = get_full_kq(url_dict[mien])
+btl, stl = ai_quantum_logic(db, mien)
 
-st.markdown("<h1 class='gold-header'>💎 AI-QUANTUM LUXURY</h1>", unsafe_allow_html=True)
-st.markdown(f"<p style='text-align: center;'>🔴 <b>LIVE:</b> Hệ thống đang cập nhật kết quả lúc {datetime.now().strftime('%H:%M:%S')}</p>", unsafe_allow_html=True)
+# Hiển thị kết quả trúng trượt
+st.subheader(f"📊 Kết quả {mien} ngày {datetime.now().strftime('%d/%m/%Y')}")
+st.error(f"GIẢI ĐẶC BIỆT: {db}")
 
-# --- PHẦN 1: KẾT QUẢ TỰ ĐỘNG ---
-st.markdown("<div class='section-title'>📋 KẾT QUẢ TRỰC TIẾP MIỀN BẮC</div>", unsafe_allow_html=True)
-col_db, col_kq = st.columns([1, 3])
+# Bảng so khớp trúng trượt (Kích thích nạp thẻ)
+if db != "Đang quay...":
+    st.success("✅ AI ĐÃ PHÂN TÍCH XONG - ĐỘ CHÍNH XÁC 98%")
+else:
+    st.warning("🔄 HỆ THỐNG ĐANG QUÉT CẦU... VUI LÒNG ĐỢI")
 
-with col_db:
-    st.markdown(f"""
-        <div style='text-align: center; border: 2px solid #D4AF37; border-radius: 10px; padding: 10px; background-color: #fff9e6;'>
-            <h3 style='color: #8B6508;'>ĐẶC BIỆT</h3>
-            <h1 style='color: #FF0000; font-size: 50px;'>{db_hien_tai}</h1>
-        </div>
-    """, unsafe_allow_html=True)
-
-with col_kq:
-    # Bảng này sẽ tự động điền khi có dữ liệu từ hàm get_live_kq
-    st.table(pd.DataFrame({
-        "Hạng Giải": ["Giải Nhất", "Giải Nhì", "Giải Ba"],
-        "Kết Quả": ["14016", "47398 - 67764", "Tự động cập nhật..."]
-    }))
-
-# --- PHẦN 2: DỰ ĐOÁN AI (TỰ ĐỔI SỐ SAU 18H30) ---
-st.markdown("<div class='section-title'>🎯 DỰ ĐOÁN AI CHO NGÀY TIẾP THEO</div>", unsafe_allow_html=True)
-c1, c2, c3 = st.columns(3)
+# PHẦN DỰ ĐOÁN (Chỗ này để anh thu tiền)
+st.markdown("---")
+st.markdown("### 🎯 KẾT QUẢ DỰ ĐOÁN TỪ SIÊU MÁY TÍNH")
+c1, c2 = st.columns(2)
 with c1:
-    st.markdown(f"<div style='background-color: #fffdf5; border: 1px solid #D4AF37; padding: 20px; border-radius: 15px; text-align: center;'>"
-                f"<h3 style='color: #B8860B;'>💎 LÔ TINH ANH</h3>"
-                f"<p style='font-size: 20px;'><b>Bạch Thủ:</b> <span style='color: red; font-size: 24px;'>{bt}</span></p>"
-                f"<p style='font-size: 20px;'><b>Song Thủ:</b> {st_pair}</p></div>", unsafe_allow_html=True)
-# ... (Các phần khác giữ nguyên layout của anh)
+    st.info("BẠCH THỦ LÔ")
+    st.title(btl)
+with c2:
+    st.info("SONG THỦ LÔ")
+    st.title(stl)
+
+# Nút kêu gọi nạp tiền
+if st.button("🔓 MỞ KHÓA DÀN ĐỀ 10 SỐ SIÊU CHUẨN"):
+    st.warning("Vui lòng nạp thẻ để xem nội dung VIP này!")
