@@ -10,162 +10,53 @@ import pandas as pd
 # =============================================================================
 st.set_page_config(page_title="AI-QUANTUM GLOBAL 💎", page_icon="💎", layout="wide")
 
-# CSS - Tập trung vào bảng kết quả chuẩn Đại Phát
+# CSS
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
+    .main { background: #f5f5f5; }
     
-    * { font-family: 'Roboto', sans-serif; }
-    
-    .main { 
-        background: #f5f5f5; 
-        padding: 0;
-    }
-    
-    /* Header Gold */
-    .header-gold {
-        background: linear-gradient(135deg, #D4AF37 0%, #B8962E 100%);
+    .gold-header {
+        background: linear-gradient(135deg, #D4AF37, #B8962E);
         padding: 25px;
-        text-align: center;
         border-radius: 10px;
-        margin: 15px 0;
-        box-shadow: 0 4px 15px rgba(212,175,55,0.3);
-    }
-    .header-gold h1 {
-        color: #000;
-        margin: 0;
-        font-size: 2.2em;
-        font-weight: 900;
-        letter-spacing: 2px;
-    }
-    .header-gold p {
-        color: #1a1a1a;
-        margin: 8px 0 0;
-        font-weight: 600;
-    }
-    
-    /* Timestamp */
-    .timestamp-box {
-        background: #fff;
-        border: 2px solid #D4AF37;
-        padding: 10px 20px;
-        border-radius: 25px;
         text-align: center;
         margin: 15px 0;
-        font-weight: 600;
-        color: #D4AF37;
     }
     
-    /* BẢNG KẾT QUẢ CHUẨN ĐẠI PHÁT */
-    .result-table-container {
-        background: #fff;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        margin: 20px 0;
-    }
-    
-    .result-table-header {
+    .result-header {
         background: linear-gradient(135deg, #c41e3a, #8b0000);
-        color: #fff;
+        color: white;
         padding: 15px;
         text-align: center;
         font-weight: 900;
         font-size: 1.3em;
-        text-transform: uppercase;
+        border-radius: 8px 8px 0 0;
     }
     
-    .result-table {
-        width: 100%;
-        border-collapse: collapse;
-        background: #fff;
-    }
-    
-    .result-table tr {
-        border-bottom: 1px solid #e0e0e0;
-    }
-    
-    .result-table tr:last-child {
-        border-bottom: none;
-    }
-    
-    .result-table tr:hover {
-        background: #f9f9f9;
-    }
-    
-    .result-table td {
-        padding: 12px 15px;
-        vertical-align: middle;
-    }
-    
-    .prize-label {
-        width: 80px;
-        font-weight: 700;
-        color: #333;
-        font-size: 0.95em;
-        background: #f5f5f5;
-        border-right: 2px solid #ddd;
-    }
-    
-    .prize-value {
-        text-align: center;
-        font-weight: 700;
-        font-size: 1.2em;
-        color: #000;
-        letter-spacing: 1px;
-    }
-    
-    .prize-value.special {
+    .special-num {
         color: #c41e3a;
         font-size: 2.5em;
         font-weight: 900;
+        text-align: center;
         letter-spacing: 5px;
-        text-shadow: 0 0 5px rgba(196,30,58,0.3);
     }
     
-    .prize-value.g1 {
+    .g1-num {
         font-size: 1.8em;
         font-weight: 800;
+        text-align: center;
     }
     
-    .prize-value.g7 {
+    .number-text {
+        font-size: 1.2em;
+        font-weight: 700;
+        text-align: center;
+    }
+    
+    .g7-num {
         color: #c41e3a;
         font-weight: 800;
-    }
-    
-    .number-sep {
-        display: inline-block;
-        margin: 0 15px;
-        color: #999;
-    }
-    
-    /* PREDICTION CARDS */
-    .pred-container {
-        background: #fff;
-        border-radius: 10px;
-        padding: 20px;
-        margin: 20px 0;
-        border: 3px solid #D4AF37;
-        box-shadow: 0 2px 10px rgba(212,175,55,0.2);
-    }
-    
-    .pred-title {
-        background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-        color: #D4AF37;
-        padding: 15px;
-        border-radius: 8px;
         text-align: center;
-        font-weight: 900;
-        font-size: 1.3em;
-        margin-bottom: 20px;
-        text-transform: uppercase;
-    }
-    
-    .pred-cards {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-        margin-bottom: 20px;
     }
     
     .pred-card {
@@ -174,14 +65,7 @@ st.markdown("""
         border-radius: 10px;
         padding: 20px;
         text-align: center;
-    }
-    
-    .pred-card h4 {
-        color: #D4AF37;
-        margin: 0 0 15px 0;
-        font-size: 1em;
-        font-weight: 700;
-        text-transform: uppercase;
+        margin: 10px 0;
     }
     
     .pred-number {
@@ -189,67 +73,24 @@ st.markdown("""
         font-weight: 900;
         color: #000;
         margin: 10px 0;
-        letter-spacing: 3px;
     }
     
-    .pred-conf {
-        color: #c41e3a;
-        font-weight: 700;
-        font-size: 0.95em;
-        margin-top: 8px;
-    }
-    
-    .dan-de-box {
+    .dan-de-container {
         background: linear-gradient(135deg, #fffef0, #fff);
         border: 3px solid #D4AF37;
         border-radius: 10px;
         padding: 20px;
         text-align: center;
-    }
-    
-    .dan-de-box h4 {
-        color: #D4AF37;
-        margin: 0 0 15px 0;
-        font-size: 1.1em;
-        font-weight: 700;
-    }
-    
-    .dan-de-numbers {
-        font-size: 1.5em;
-        font-weight: 700;
-        color: #000;
-        letter-spacing: 3px;
-        line-height: 1.8;
-    }
-    
-    /* HISTORY */
-    .history-container {
-        background: #fff;
-        border-radius: 10px;
-        padding: 20px;
         margin: 20px 0;
+    }
+    
+    .stats-box {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
         border: 2px solid #D4AF37;
     }
-    
-    .history-title {
-        color: #D4AF37;
-        font-size: 1.3em;
-        font-weight: 900;
-        margin-bottom: 15px;
-        text-transform: uppercase;
-    }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-        .pred-cards { grid-template-columns: 1fr; }
-        .prize-value.special { font-size: 1.8em; }
-        .prize-value.g1 { font-size: 1.3em; }
-        .number-sep { margin: 0 8px; }
-    }
-    
-    /* Hide Streamlit elements */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -264,11 +105,9 @@ def get_kqxs(mien):
         "Miền Nam": "https://xosodaiphat.com/xsmn-xổ-số-miền-nam.html"
     }
     
-    # Mock data chuẩn như Đại Phát
     data_default = {
         "Miền Bắc": {
-            "special": "74197", 
-            "first": "88897",
+            "special": "74197", "first": "88897",
             "second": ["75281", "83073"],
             "third": ["29125", "09606", "31567", "93696", "67272", "21532"],
             "fourth": ["4114", "0721", "0708", "0206"],
@@ -277,8 +116,7 @@ def get_kqxs(mien):
             "seventh": ["34", "06", "47", "39"]
         },
         "Miền Trung": {
-            "special": "52846", 
-            "first": "19273",
+            "special": "52846", "first": "19273",
             "second": ["48291", "73654"],
             "third": ["12847", "56392", "84756"],
             "fourth": ["9284", "4756", "1928", "6473"],
@@ -287,8 +125,7 @@ def get_kqxs(mien):
             "seventh": ["28", "47", "93", "56"]
         },
         "Miền Nam": {
-            "special": "39284", 
-            "first": "67492",
+            "special": "39284", "first": "67492",
             "second": ["83746", "29384"],
             "third": ["47382", "92847", "38475", "62938", "47562", "93847"],
             "fourth": ["8374", "2938", "4756", "9283"],
@@ -304,17 +141,15 @@ def get_kqxs(mien):
         soup = BeautifulSoup(res.text, 'html.parser')
         result = data_default[mien].copy()
         
-        # Parse special
         sp = soup.find("div", {"class": "special-prize"})
         if sp:
-            val = sp.find("div", class_="text-center") or sp.find("span")
+            val = sp.find("div", class_="text-center")
             if val:
                 result["special"] = val.get_text(strip=True)
         
-        # Parse first
         g1 = soup.find("div", {"class": "first-prize"})
         if g1:
-            val = g1.find("div", class_="text-center") or g1.find("span")
+            val = g1.find("div", class_="text-center")
             if val:
                 result["first"] = val.get_text(strip=True)
         
@@ -322,13 +157,9 @@ def get_kqxs(mien):
     except:
         return data_default[mien]
 
-# =============================================================================
-# 🎯 PREDICTIONS
-# =============================================================================
 @st.cache_data(ttl=600)
 def get_du_doan(mien):
     np.random.seed(int(datetime.now().strftime("%H%M")) + hash(mien) % 100)
-    
     bt = f"{np.random.randint(0,100):02d}"
     st1 = f"{np.random.randint(0,100):02d}"
     st2 = f"{np.random.randint(0,100):02d}"
@@ -342,9 +173,6 @@ def get_du_doan(mien):
         "dan_de": sorted([f"{i:02d}" for i in np.random.choice(100, 10, replace=False)])
     }
 
-# =============================================================================
-# 📊 HISTORY
-# =============================================================================
 @st.cache_data
 def get_lich_su():
     return {
@@ -366,123 +194,101 @@ def get_lich_su():
     }
 
 # =============================================================================
-# 🎨 RENDER FUNCTIONS
+# 🎨 RENDER FUNCTIONS - STREAMLIT NATIVE
 # =============================================================================
 def render_bang_ket_qua(mien, kq):
-    """Render bảng kết quả CHUẨN ĐẠI PHÁT"""
+    """Bảng kết quả bằng Streamlit DataFrame"""
     titles = {
         "Miền Bắc": "🔴 XSMB - KẾT QUẢ XỔ SỐ MIỀN BẮC",
         "Miền Trung": "🟡 XSMT - KẾT QUẢ XỔ SỐ MIỀN TRUNG",
         "Miền Nam": "🟢 XSMN - KẾT QUẢ XỔ SỐ MIỀN NAM"
     }
     
-    html = f"""
-    <div class="result-table-container">
-        <div class="result-table-header">{titles[mien]}</div>
-        <table class="result-table">
-            <tr>
-                <td class="prize-label">G.ĐB</td>
-                <td class="prize-value special">{kq['special']}</td>
-            </tr>
-            <tr>
-                <td class="prize-label">G.1</td>
-                <td class="prize-value g1">{kq['first']}</td>
-            </tr>
-            <tr>
-                <td class="prize-label">G.2</td>
-                <td class="prize-value">{'<span class="number-sep">•</span>'.join(kq['second'])}</td>
-            </tr>
-            <tr>
-                <td class="prize-label">G.3</td>
-                <td class="prize-value">{'<span class="number-sep">•</span>'.join(kq['third'])}</td>
-            </tr>
-            <tr>
-                <td class="prize-label">G.4</td>
-                <td class="prize-value">{'<span class="number-sep">•</span>'.join(kq['fourth'])}</td>
-            </tr>
-            <tr>
-                <td class="prize-label">G.5</td>
-                <td class="prize-value">{'<span class="number-sep">•</span>'.join(kq['fifth'])}</td>
-            </tr>
-            <tr>
-                <td class="prize-label">G.6</td>
-                <td class="prize-value">{'<span class="number-sep">•</span>'.join(kq['sixth'])}</td>
-            </tr>
-            <tr>
-                <td class="prize-label">G.7</td>
-                <td class="prize-value g7">{'<span class="number-sep">•</span>'.join(kq['seventh'])}</td>
-            </tr>
-        </table>
-    </div>
-    """
-    st.markdown(html, unsafe_allow_html=True)
+    # Title
+    st.markdown(f'<div class="result-header">{titles[mien]}</div>', unsafe_allow_html=True)
+    
+    # Create DataFrame
+    df_data = {
+        "Giải": ["G.ĐB", "G.1", "G.2", "G.3", "G.4", "G.5", "G.6", "G.7"],
+        "Kết quả": [
+            kq["special"],
+            kq["first"],
+            " • ".join(kq["second"]),
+            " • ".join(kq["third"]),
+            " • ".join(kq["fourth"]),
+            " • ".join(kq["fifth"]),
+            " • ".join(kq["sixth"]),
+            " • ".join(kq["seventh"])
+        ]
+    }
+    
+    df = pd.DataFrame(df_data)
+    
+    # Display with custom styling
+    st.dataframe(
+        df,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Giải": st.column_config.TextColumn(width="small"),
+            "Kết quả": st.column_config.TextColumn(width="large")
+        }
+    )
 
 
 def render_du_doan(dd):
-    """Render dự đoán VIP"""
-    html = f"""
-    <div class="pred-container">
-        <div class="pred-title">💎 DỰ ĐOÁN VIP AI-QUANTUM</div>
-        
-        <div class="pred-cards">
-            <div class="pred-card">
-                <h4>✅ BẠCH THỦ LÔ VIP</h4>
-                <div class="pred-number">{dd['bach_thu']}</div>
-                <div class="pred-conf">🎯 Độ tin cậy: {dd['conf_bt']}%</div>
-            </div>
-            
-            <div class="pred-card">
-                <h4>✅ SONG THỦ LÔ VIP</h4>
-                <div class="pred-number">{' - '.join(dd['song_thu'])}</div>
-                <div class="pred-conf">🎯 Độ tin cậy: {dd['conf_st']}%</div>
-            </div>
-            
-            <div class="pred-card">
-                <h4>✅ XIÊN 2</h4>
-                <div class="pred-number">{' - '.join(dd['xien_2'])}</div>
-                <div class="pred-conf">⭐ Chuẩn xác cao</div>
-            </div>
-        </div>
-        
-        <div class="dan-de-box">
-            <h4>🔥 DÀN ĐỀ 10 SỐ VIP 🔥</h4>
-            <div class="dan-de-numbers">{', '.join(dd['dan_de'])}</div>
-        </div>
-    </div>
-    """
-    st.markdown(html, unsafe_allow_html=True)
+    """Dự đoán bằng Streamlit columns - NO HTML"""
+    st.markdown('<div class="gold-header" style="margin: 20px 0;"><h2 style="color: #000; margin: 0;">💎 DỰ ĐOÁN VIP AI-QUANTUM</h2></div>', unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown('<div class="pred-card">', unsafe_allow_html=True)
+        st.markdown("### ✅ BẠCH THỦ LÔ VIP")
+        st.markdown(f'<div class="pred-number">{dd["bach_thu"]}</div>', unsafe_allow_html=True)
+        st.markdown(f"🎯 **Độ tin cậy: {dd['conf_bt']}%**")
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown('<div class="pred-card">', unsafe_allow_html=True)
+        st.markdown("### ✅ SONG THỦ LÔ VIP")
+        st.markdown(f'<div class="pred-number">{" - ".join(dd["song_thu"])}</div>', unsafe_allow_html=True)
+        st.markdown(f"🎯 **Độ tin cậy: {dd['conf_st']}%**")
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown('<div class="pred-card">', unsafe_allow_html=True)
+        st.markdown("### ✅ XIÊN 2")
+        st.markdown(f'<div class="pred-number">{" - ".join(dd["xien_2"])}</div>', unsafe_allow_html=True)
+        st.markdown("⭐ **Chuẩn xác cao**")
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Dàn đề
+    st.markdown('<div class="dan-de-container">', unsafe_allow_html=True)
+    st.markdown("### 🔥 DÀN ĐỀ 10 SỐ VIP 🔥")
+    st.markdown(f'<div style="font-size: 1.5em; font-weight: 700; letter-spacing: 3px;">{", ".join(dd["dan_de"])}</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 def render_lich_su(mien, lich_su):
-    """Render lịch sử"""
+    """Lịch sử bằng Streamlit metrics và dataframe"""
     data = lich_su.get(mien, [])
     total = len(data)
     wins = sum(1 for d in data if d["win"])
     rate = (wins/total*100) if total > 0 else 0
     
-    html = f"""
-    <div class="history-container">
-        <div class="history-title">📊 LỊCH SỬ DỰ ĐOÁN</div>
-        
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;">
-            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #D4AF37;">
-                <div style="font-size: 1.8em; font-weight: 900; color: #D4AF37;">{total}</div>
-                <div style="color: #666; font-size: 0.9em;">Tổng</div>
-            </div>
-            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #10b981;">
-                <div style="font-size: 1.8em; font-weight: 900; color: #10b981;">{wins}</div>
-                <div style="color: #666; font-size: 0.9em;">Trúng</div>
-            </div>
-            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #c41e3a;">
-                <div style="font-size: 1.8em; font-weight: 900; color: #c41e3a;">{rate:.0f}%</div>
-                <div style="color: #666; font-size: 0.9em;">Tỷ lệ</div>
-            </div>
-        </div>
-    </div>
-    """
-    st.markdown(html, unsafe_allow_html=True)
+    st.markdown("### 📊 LỊCH SỬ DỰ ĐOÁN")
     
-    # DataFrame cho lịch sử
+    # Stats
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Tổng", total)
+    with col2:
+        st.metric("Trúng", wins)
+    with col3:
+        st.metric("Tỷ lệ", f"{rate:.0f}%")
+    
+    # Table
     if data:
         df_data = []
         for item in data:
@@ -493,6 +299,7 @@ def render_lich_su(mien, lich_su):
                 "Kết quả": item["result"],
                 "Trạng thái": "✅" if item["win"] else "❌"
             })
+        
         df = pd.DataFrame(df_data)
         st.dataframe(df, use_container_width=True, hide_index=True)
 
@@ -502,15 +309,15 @@ def render_lich_su(mien, lich_su):
 def main():
     # Header
     st.markdown("""
-    <div class="header-gold">
-        <h1>💎 AI-QUANTUM GLOBAL</h1>
-        <p>Hệ thống phân tích xổ số thông minh</p>
+    <div class="gold-header">
+        <h1 style="color: #000; margin: 0; font-size: 2.5em;">💎 AI-QUANTUM GLOBAL</h1>
+        <p style="color: #1a1a1a; margin: 10px 0 0; font-weight: 600;">Hệ thống phân tích xổ số thông minh</p>
     </div>
     """, unsafe_allow_html=True)
     
     # Timestamp
     now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    st.markdown(f'<div class="timestamp-box">📅 Cập nhật: {now}</div>', unsafe_allow_html=True)
+    st.info(f"📅 Cập nhật: {now}")
     
     # Disclaimer
     st.warning("⚠️ **Lưu ý:** Xổ số là trò chơi ngẫu nhiên. Kết quả chỉ mang tính tham khảo giải trí.")
@@ -518,7 +325,6 @@ def main():
     # Tabs
     tab1, tab2, tab3 = st.tabs(["🔴 MIỀN BẮC", "🟡 MIỀN TRUNG", "🟢 MIỀN NAM"])
     
-    # Load data
     lich_su = get_lich_su()
     
     # Miền Bắc
@@ -545,18 +351,14 @@ def main():
         render_du_doan(dd_mn)
         render_lich_su("Miền Nam", lich_su)
     
-    # Refresh button
+    # Refresh
     if st.button("🔄 LÀM MỚI DỮ LIỆU", use_container_width=True):
         st.cache_data.clear()
         st.rerun()
     
     # Footer
-    st.markdown("""
-    <div style="text-align: center; padding: 20px; color: #666; border-top: 2px solid #D4AF37; margin-top: 30px;">
-        <p style="margin: 0; font-weight: 600;">💎 AI-QUANTUM GLOBAL</p>
-        <p style="margin: 5px 0 0; font-size: 0.9em;">Chơi xổ số có trách nhiệm</p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("---")
+    st.markdown("<div style='text-align: center; color: #666; padding: 20px;'><strong>💎 AI-QUANTUM GLOBAL</strong><br>Chơi xổ số có trách nhiệm</div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
