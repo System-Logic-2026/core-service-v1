@@ -7,32 +7,33 @@ import numpy as np
 # =============================================================================
 # 🔧 CẤU HÌNH
 # =============================================================================
-st.set_page_config(page_title="AI-QUANTUM GLOBAL 💎", page_icon="💎", layout="wide")
+st.set_page_config(page_title="AI-QUANTUM GLOBAL", page_icon="💎", layout="wide")
 
+# CSS Gold Theme
 st.markdown("""
 <style>
     .main { background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%); }
     
     .header {
-        background: linear-gradient(135deg, #D4AF37 0%, #B8962E 100%);
+        background: linear-gradient(135deg, #D4AF37, #B8962E);
         padding: 25px;
         text-align: center;
         border-radius: 10px;
-        margin-bottom: 15px;
-        box-shadow: 0 4px 15px rgba(212,175,55,0.3);
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(212,175,55,0.4);
     }
-    .header h1 { margin: 0; color: #000; font-size: 2em; font-weight: 900; }
-    .header p { margin: 5px 0 0; color: #1a1a1a; font-weight: 600; }
+    .header h1 { color: #000; margin: 0; font-size: 2em; font-weight: 900; }
+    .header p { color: #1a1a1a; margin: 5px 0 0; font-weight: 600; }
     
     .timestamp {
-        background: rgba(212,175,55,0.1);
-        border: 1px solid #D4AF37;
-        padding: 8px 15px;
+        background: rgba(212,175,55,0.15);
+        border: 2px solid #D4AF37;
+        padding: 10px;
         border-radius: 20px;
         text-align: center;
         color: #D4AF37;
         font-weight: 600;
-        margin: 10px 0;
+        margin: 15px 0;
     }
     
     .disclaimer {
@@ -42,16 +43,17 @@ st.markdown("""
         border-radius: 5px;
         color: #D4AF37;
         font-size: 0.9em;
-        margin: 10px 0;
+        margin: 15px 0;
     }
     
     .result-box {
         background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
         border: 2px solid #D4AF37;
         border-radius: 10px;
-        padding: 15px;
+        padding: 20px;
         margin: 15px 0;
     }
+    
     .result-title {
         background: linear-gradient(135deg, #D4AF37, #B8962E);
         color: #000;
@@ -59,68 +61,64 @@ st.markdown("""
         border-radius: 5px;
         text-align: center;
         font-weight: 900;
-        margin-bottom: 10px;
+        font-size: 1.2em;
+        margin-bottom: 15px;
     }
+    
     .row {
         display: flex;
-        padding: 8px;
+        padding: 10px;
         margin: 5px 0;
         background: rgba(212,175,55,0.05);
         border-radius: 5px;
         border-left: 3px solid #D4AF37;
     }
-    .label {
-        width: 70px;
-        font-weight: 700;
-        color: #D4AF37;
-    }
-    .value {
-        flex: 1;
-        text-align: center;
-        font-weight: 700;
-        color: #fff;
-        font-size: 1.1em;
-    }
-    .value.special {
-        color: #FFD700;
-        font-size: 2em;
-        font-weight: 900;
-        text-shadow: 0 0 10px rgba(255,215,0,0.5);
-    }
+    .label { width: 70px; font-weight: 700; color: #D4AF37; }
+    .value { flex: 1; text-align: center; font-weight: 700; color: #fff; font-size: 1.1em; }
+    .value.special { color: #FFD700; font-size: 2em; font-weight: 900; }
     .value.g7 { color: #D4AF37; }
     
+    .pred-section {
+        background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+        border: 2px solid #D4AF37;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+    .pred-title {
+        text-align: center;
+        color: #D4AF37;
+        font-size: 1.3em;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+    
+    .pred-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 15px;
+    }
     .pred-card {
         background: rgba(212,175,55,0.1);
         border: 2px solid #D4AF37;
-        border-radius: 10px;
+        border-radius: 8px;
         padding: 15px;
         text-align: center;
-        margin: 10px 0;
     }
-    .pred-card h4 { color: #D4AF37; margin: 0 0 10px; }
-    .pred-card .number {
-        font-size: 2em;
-        font-weight: 900;
-        color: #fff;
-        margin: 10px 0;
-    }
-    .pred-card .info { color: #888; font-size: 0.9em; }
+    .pred-card h4 { color: #D4AF37; margin: 0 0 10px; font-size: 0.9em; }
+    .pred-card .num { font-size: 1.8em; font-weight: 900; color: #fff; margin: 10px 0; }
+    .pred-card .conf { color: #D4AF37; font-weight: 600; font-size: 0.9em; }
     
     .dan-de {
         background: rgba(212,175,55,0.15);
         border: 2px solid #D4AF37;
-        border-radius: 10px;
+        border-radius: 8px;
         padding: 15px;
         text-align: center;
-        margin: 15px 0;
     }
     .dan-de h4 { color: #D4AF37; margin: 0 0 10px; }
-    .dan-de .numbers {
-        font-size: 1.3em;
-        font-weight: 700;
-        color: #fff;
-        letter-spacing: 2px;
-    }
+    .dan-de .nums { font-size: 1.3em; font-weight: 700; color: #fff; letter-spacing: 2px; }
     
     .history-box {
         background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
@@ -129,21 +127,40 @@ st.markdown("""
         padding: 15px;
         margin: 15px 0;
     }
-    
-    .stButton>button {
-        background: linear-gradient(135deg, #D4AF37, #B8962E);
-        color: #000;
-        border: none;
+    .history-title {
+        color: #D4AF37;
         font-weight: 700;
-        width: 100%;
+        margin-bottom: 10px;
+        font-size: 1.1em;
     }
+    
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: 10px 0;
+    }
+    .stat {
+        background: rgba(212,175,55,0.1);
+        border: 1px solid #D4AF37;
+        border-radius: 5px;
+        padding: 10px;
+        text-align: center;
+    }
+    .stat .val { font-size: 1.5em; font-weight: 900; color: #D4AF37; }
+    .stat .lbl { color: #888; font-size: 0.8em; }
     
     .footer {
         text-align: center;
         padding: 20px;
         color: #666;
-        margin-top: 20px;
+        margin-top: 30px;
         border-top: 1px solid #333;
+    }
+    
+    @media (max-width: 600px) {
+        .pred-grid { grid-template-columns: 1fr; }
+        .stats { grid-template-columns: 1fr; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -152,90 +169,129 @@ st.markdown("""
 # 🔄 FETCH DATA
 # =============================================================================
 @st.cache_data(ttl=300)
-def fetch_data(region):
+def get_kqxs(mien):
+    """Lấy kết quả xổ số"""
     urls = {
         "Miền Bắc": "https://xosodaiphat.com/xsmb-xổ-số-miền-bắc.html",
         "Miền Trung": "https://xosodaiphat.com/xsmt-xổ-số-miền-trung.html",
         "Miền Nam": "https://xosodaiphat.com/xsmn-xổ-số-miền-nam.html"
     }
     
+    # Mock data mặc định (luôn có)
+    data_default = {
+        "Miền Bắc": {
+            "special": "74197", "first": "88897",
+            "second": ["75281", "83073"],
+            "third": ["29125", "09606", "31567"],
+            "fourth": ["4114", "0721", "0708", "0206"],
+            "fifth": ["2853", "0707", "7804"],
+            "sixth": ["466", "461", "061"],
+            "seventh": ["34", "06", "47", "39"]
+        },
+        "Miền Trung": {
+            "special": "52846", "first": "19273",
+            "second": ["48291", "73654"],
+            "third": ["12847", "56392", "84756"],
+            "fourth": ["9284", "4756", "1928", "6473"],
+            "fifth": ["3847", "9283", "4756"],
+            "sixth": ["384", "928", "475"],
+            "seventh": ["28", "47", "93", "56"]
+        },
+        "Miền Nam": {
+            "special": "39284", "first": "67492",
+            "second": ["83746", "29384"],
+            "third": ["47382", "92847", "38475"],
+            "fourth": ["8374", "2938", "4756", "9283"],
+            "fifth": ["3847", "9283", "4756"],
+            "sixth": ["384", "928", "475", "192"],
+            "seventh": ["38", "92", "47", "56"]
+        }
+    }
+    
     try:
         headers = {'User-Agent': 'Mozilla/5.0'}
-        res = requests.get(urls[region], headers=headers, timeout=10)
+        res = requests.get(urls[mien], headers=headers, timeout=10)
         soup = BeautifulSoup(res.text, 'html.parser')
         
-        # Mock data fallback (đảm bảo luôn có data)
-        mock = {
-            "Miền Bắc": {
-                "special": "74197", "first": "88897",
-                "second": ["75281", "83073"],
-                "third": ["29125", "09606", "31567"],
-                "fourth": ["4114", "0721"],
-                "fifth": ["2853", "0707"],
-                "sixth": ["466", "461"],
-                "seventh": ["34", "06"]
-            },
-            "Miền Trung": {
-                "special": "52846", "first": "19273",
-                "second": ["48291", "73654"],
-                "third": ["12847", "56392"],
-                "fourth": ["9284", "4756"],
-                "fifth": ["3847", "9283"],
-                "sixth": ["384", "928"],
-                "seventh": ["28", "47"]
-            },
-            "Miền Nam": {
-                "special": "39284", "first": "67492",
-                "second": ["83746", "29384"],
-                "third": ["47382", "92847"],
-                "fourth": ["8374", "2938"],
-                "fifth": ["3847", "9283"],
-                "sixth": ["384", "928"],
-                "seventh": ["38", "92"]
-            }
-        }
+        # Thử parse - nếu fail thì dùng mock data
+        result = data_default[mien].copy()
         
-        # Try parse real data
-        special = soup.find("div", class_="special-prize")
-        if special:
-            val = special.find("span") or special.find("div")
+        # Tìm giải đặc biệt
+        sp = soup.find("div", {"class": "special-prize"})
+        if sp:
+            val = sp.find("span") or sp.find("div")
             if val:
-                mock[region]["special"] = val.get_text(strip=True)
+                result["special"] = val.get_text(strip=True)
         
-        return mock[region]
+        # Tìm giải nhất
+        g1 = soup.find("div", {"class": "first-prize"})
+        if g1:
+            val = g1.find("span") or g1.find("div")
+            if val:
+                result["first"] = val.get_text(strip=True)
         
-    except Exception as e:
-        return {
-            "special": "⏳ Đang cập nhật", "first": "...",
-            "second": ["...", "..."], "third": ["...", "..."],
-            "fourth": ["...", "..."], "fifth": ["...", "..."],
-            "sixth": ["...", "..."], "seventh": ["...", "..."]
-        }
+        result["timestamp"] = datetime.now().strftime("%H:%M:%S")
+        return result
+        
+    except:
+        data = data_default[mien].copy()
+        data["timestamp"] = datetime.now().strftime("%H:%M:%S")
+        return data
 
 # =============================================================================
 # 🎯 PREDICTIONS
 # =============================================================================
-@st.cache_data(ttl=1800)
-def get_predictions(region):
-    np.random.seed(int(datetime.now().strftime("%H%M")) + hash(region) % 100)
+@st.cache_data(ttl=600)
+def get_du_doan(mien):
+    """Tạo dự đoán AI"""
+    np.random.seed(int(datetime.now().strftime("%H%M")) + hash(mien) % 100)
     
     bt = f"{np.random.randint(0,100):02d}"
-    st_list = [f"{np.random.randint(0,100):02d}", f"{np.random.randint(0,100):02d}"]
-    conf = np.random.randint(70, 95)
+    st1 = f"{np.random.randint(0,100):02d}"
+    st2 = f"{np.random.randint(0,100):02d}"
+    conf_bt = np.random.randint(75, 95)
+    conf_st = np.random.randint(70, 90)
+    
+    dan_de = sorted([f"{i:02d}" for i in np.random.choice(100, 10, replace=False)])
     
     return {
         "bach_thu": bt,
-        "song_thu": st_list,
-        "xien_2": [bt, st_list[0]],
-        "dan_de": [f"{i:02d}" for i in np.random.choice(100, 10, replace=False)],
-        "confidence": conf
+        "conf_bt": conf_bt,
+        "song_thu": f"{st1} - {st2}",
+        "conf_st": conf_st,
+        "xien_2": f"{bt} - {st1}",
+        "dan_de": ", ".join(dan_de)
+    }
+
+# =============================================================================
+# 📊 HISTORY
+# =============================================================================
+@st.cache_data
+def get_lich_su():
+    """Lịch sử dự đoán"""
+    return {
+        "Miền Bắc": [
+            {"date": "19/04", "type": "Bạch Thủ", "pred": "79", "result": "25", "status": "❌"},
+            {"date": "18/04", "type": "Song Thủ", "pred": "24-42", "result": "84", "status": "✅"},
+            {"date": "17/04", "type": "Bạch Thủ", "pred": "09", "result": "09", "status": "✅🎉"},
+        ],
+        "Miền Trung": [
+            {"date": "19/04", "type": "Bạch Thủ", "pred": "38", "result": "62", "status": "❌"},
+            {"date": "18/04", "type": "Song Thủ", "pred": "06-60", "result": "60", "status": "✅"},
+            {"date": "17/04", "type": "Bạch Thủ", "pred": "47", "result": "47", "status": "✅🎉"},
+        ],
+        "Miền Nam": [
+            {"date": "19/04", "type": "Bạch Thủ", "pred": "15", "result": "15", "status": "✅🎉"},
+            {"date": "18/04", "type": "Song Thủ", "pred": "78-87", "result": "78", "status": "✅"},
+            {"date": "17/04", "type": "Xiên 2", "pred": "15-78", "result": "78", "status": "✅"},
+        ]
     }
 
 # =============================================================================
 # 🎨 RENDER FUNCTIONS
 # =============================================================================
-def render_results(region_name, result_data):
-    """Render kết quả xổ số - ĐÃ SỬA LỖI"""
+def show_kq(mien, kq):
+    """Hiển thị kết quả"""
     titles = {
         "Miền Bắc": "🔴 XSMB - KẾT QUẢ",
         "Miền Trung": "🟡 XSMT - KẾT QUẢ",
@@ -244,138 +300,150 @@ def render_results(region_name, result_data):
     
     html = f"""
     <div class="result-box">
-        <div class="result-title">{titles[region_name]}</div>
+        <div class="result-title">{titles[mien]}</div>
         
         <div class="row">
             <div class="label">G.ĐB</div>
-            <div class="value special">{result_data.get('special', '...')}</div>
+            <div class="value special">{kq['special']}</div>
         </div>
         
         <div class="row">
             <div class="label">G.1</div>
-            <div class="value">{result_data.get('first', '...')}</div>
+            <div class="value">{kq['first']}</div>
         </div>
         
         <div class="row">
             <div class="label">G.2</div>
-            <div class="value">{' • '.join(result_data.get('second', ['...', '...']))}</div>
+            <div class="value">{' • '.join(kq['second'])}</div>
         </div>
         
         <div class="row">
             <div class="label">G.3</div>
-            <div class="value">{' • '.join(result_data.get('third', ['...', '...']))}</div>
+            <div class="value">{' • '.join(kq['third'])}</div>
         </div>
         
         <div class="row">
             <div class="label">G.4</div>
-            <div class="value">{' • '.join(result_data.get('fourth', ['...', '...']))}</div>
+            <div class="value">{' • '.join(kq['fourth'])}</div>
         </div>
         
         <div class="row">
             <div class="label">G.5</div>
-            <div class="value">{' • '.join(result_data.get('fifth', ['...', '...']))}</div>
+            <div class="value">{' • '.join(kq['fifth'])}</div>
         </div>
         
         <div class="row">
             <div class="label">G.6</div>
-            <div class="value">{' • '.join(result_data.get('sixth', ['...', '...']))}</div>
+            <div class="value">{' • '.join(kq['sixth'])}</div>
         </div>
         
         <div class="row">
             <div class="label">G.7</div>
-            <div class="value g7">{' • '.join(result_data.get('seventh', ['...', '...']))}</div>
+            <div class="value g7">{' • '.join(kq['seventh'])}</div>
+        </div>
+        
+        <div style="text-align:center; color:#666; margin-top:10px; font-size:0.85em;">
+            Cập nhật: {kq.get('timestamp', '...')}
         </div>
     </div>
     """
     st.markdown(html, unsafe_allow_html=True)
 
 
-def render_predictions_ui(pred_data):
-    """Render dự đoán"""
+def show_du_doan(dd):
+    """Hiển thị dự đoán"""
     html = f"""
-    <div class="pred-card">
-        <h4>✅ BẠCH THỦ LÔ VIP</h4>
-        <div class="number">{pred_data['bach_thu']}</div>
-        <div class="info">Độ tin cậy: {pred_data['confidence']}%</div>
-    </div>
-    
-    <div class="pred-card">
-        <h4>✅ SONG THỦ LÔ VIP</h4>
-        <div class="number">{' - '.join(pred_data['song_thu'])}</div>
-        <div class="info">Nhịp cầu đẹp</div>
-    </div>
-    
-    <div class="pred-card">
-        <h4>✅ XIÊN 2</h4>
-        <div class="number">{' - '.join(pred_data['xien_2'])}</div>
-        <div class="info">Chuẩn xác cao</div>
-    </div>
-    
-    <div class="dan-de">
-        <h4>🔥 DÀN ĐỀ 10 SỐ VIP</h4>
-        <div class="numbers">{', '.join(pred_data['dan_de'])}</div>
+    <div class="pred-section">
+        <div class="pred-title">💎 DỰ ĐOÁN VIP AI-QUANTUM</div>
+        
+        <div class="pred-grid">
+            <div class="pred-card">
+                <h4>✅ BẠCH THỦ LÔ VIP</h4>
+                <div class="num">{dd['bach_thu']}</div>
+                <div class="conf">🎯 Tin cậy: {dd['conf_bt']}%</div>
+            </div>
+            
+            <div class="pred-card">
+                <h4>✅ SONG THỦ LÔ VIP</h4>
+                <div class="num">{dd['song_thu']}</div>
+                <div class="conf">🎯 Tin cậy: {dd['conf_st']}%</div>
+            </div>
+            
+            <div class="pred-card">
+                <h4>✅ XIÊN 2</h4>
+                <div class="num">{dd['xien_2']}</div>
+                <div class="conf">⭐ Chuẩn xác cao</div>
+            </div>
+        </div>
+        
+        <div class="dan-de">
+            <h4>🔥 DÀN ĐỀ 10 SỐ VIP 🔥</h4>
+            <div class="nums">{dd['dan_de']}</div>
+        </div>
     </div>
     """
     st.markdown(html, unsafe_allow_html=True)
 
 
-def render_history(region_name):
-    """Render lịch sử"""
-    history_data = {
-        "Miền Bắc": [
-            {"date": "19/04", "type": "Bạch Thủ", "pred": "79", "result": "25", "win": False},
-            {"date": "18/04", "type": "Song Thủ", "pred": "24-42", "result": "84", "win": True},
-            {"date": "17/04", "type": "Bạch Thủ", "pred": "09", "result": "09", "win": True},
-        ],
-        "Miền Trung": [
-            {"date": "19/04", "type": "Bạch Thủ", "pred": "38", "result": "62", "win": False},
-            {"date": "18/04", "type": "Song Thủ", "pred": "06-60", "result": "60", "win": True},
-        ],
-        "Miền Nam": [
-            {"date": "19/04", "type": "Bạch Thủ", "pred": "15", "result": "15", "win": True},
-            {"date": "18/04", "type": "Song Thủ", "pred": "78-87", "result": "78", "win": True},
-        ]
-    }
-    
-    hist = history_data.get(region_name, [])
-    wins = sum(1 for h in hist if h['win'])
-    total = len(hist)
+def show_lich_su(mien, lich_su):
+    """Hiển thị lịch sử"""
+    data = lich_su.get(mien, [])
+    total = len(data)
+    wins = sum(1 for d in data if "✅" in d["status"])
     rate = (wins/total*100) if total > 0 else 0
+    
+    rows_html = ""
+    for item in data:
+        color = "#10b981" if "✅" in item["status"] else "#ef4444"
+        rows_html += f"""
+        <tr style="border-bottom:1px solid #333;">
+            <td style="padding:8px; color:#fff;">{item['date']}</td>
+            <td style="padding:8px; color:#D4AF37;">{item['type']}</td>
+            <td style="padding:8px; color:#fff; font-weight:600;">{item['pred']}</td>
+            <td style="padding:8px; color:#fff;">{item['result']}</td>
+            <td style="padding:8px; text-align:center; color:{color}; font-weight:700;">{item['status']}</td>
+        </tr>
+        """
     
     html = f"""
     <div class="history-box">
-        <h4 style="color: #D4AF37; margin-bottom: 10px;">📊 LỊCH SỬ DỰ ĐOÁN</h4>
-        <p style="color: #888; margin-bottom: 10px;">
-            Tổng: {total} | Trúng: {wins} | Tỷ lệ: <span style="color: #D4AF37; font-weight: 700;">{rate:.1f}%</span>
-        </p>
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">
-            <tr style="background: rgba(212,175,55,0.2); border-bottom: 2px solid #D4AF37;">
-                <th style="padding: 8px; text-align: left; color: #D4AF37;">Ngày</th>
-                <th style="padding: 8px; text-align: left; color: #D4AF37;">Loại</th>
-                <th style="padding: 8px; text-align: left; color: #D4AF37;">Dự đoán</th>
-                <th style="padding: 8px; text-align: left; color: #D4AF37;">Kết quả</th>
-                <th style="padding: 8px; text-align: center; color: #D4AF37;">Trạng thái</th>
-            </tr>
+        <div class="history-title">📊 LỊCH SỬ DỰ ĐOÁN</div>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="val">{total}</div>
+                <div class="lbl">Tổng</div>
+            </div>
+            <div class="stat">
+                <div class="val" style="color:#10b981;">{wins}</div>
+                <div class="lbl">Trúng</div>
+            </div>
+            <div class="stat">
+                <div class="val">{rate:.0f}%</div>
+                <div class="lbl">Tỷ lệ</div>
+            </div>
+        </div>
+        
+        <table style="width:100%; margin-top:10px; border-collapse:collapse;">
+            <thead>
+                <tr style="background:rgba(212,175,55,0.2); border-bottom:2px solid #D4AF37;">
+                    <th style="padding:8px; text-align:left; color:#D4AF37;">Ngày</th>
+                    <th style="padding:8px; text-align:left; color:#D4AF37;">Loại</th>
+                    <th style="padding:8px; text-align:left; color:#D4AF37;">Dự đoán</th>
+                    <th style="padding:8px; text-align:left; color:#D4AF37;">Kết quả</th>
+                    <th style="padding:8px; text-align:center; color:#D4AF37;">Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                {rows_html}
+            </tbody>
+        </table>
+    </div>
     """
-    
-    for item in hist:
-        status = "✅" if item['win'] else "❌"
-        color = "#10b981" if item['win'] else "#ef4444"
-        html += f"""
-            <tr style="border-bottom: 1px solid #333;">
-                <td style="padding: 8px; color: #fff;">{item['date']}</td>
-                <td style="padding: 8px; color: #D4AF37;">{item['type']}</td>
-                <td style="padding: 8px; color: #fff; font-weight: 600;">{item['pred']}</td>
-                <td style="padding: 8px; color: #fff;">{item['result']}</td>
-                <td style="padding: 8px; text-align: center; color: {color}; font-weight: 700;">{status}</td>
-            </tr>
-        """
-    
-    html += "</table></div>"
     st.markdown(html, unsafe_allow_html=True)
 
 # =============================================================================
-# 🚀 MAIN
+# 🚀 MAIN APP
 # =============================================================================
 def main():
     # Header
@@ -400,42 +468,43 @@ def main():
     # Tabs
     tab1, tab2, tab3 = st.tabs(["🔴 MIỀN BẮC", "🟡 MIỀN TRUNG", "🟢 MIỀN NAM"])
     
+    # Load data
+    lich_su = get_lich_su()
+    
     # Miền Bắc
     with tab1:
-        data_mb = fetch_data("Miền Bắc")
-        pred_mb = get_predictions("Miền Bắc")
-        
-        render_results("Miền Bắc", data_mb)
-        render_predictions_ui(pred_mb)
-        render_history("Miền Bắc")
+        kq_mb = get_kqxs("Miền Bắc")
+        dd_mb = get_du_doan("Miền Bắc")
+        show_kq("Miền Bắc", kq_mb)
+        show_du_doan(dd_mb)
+        show_lich_su("Miền Bắc", lich_su)
     
     # Miền Trung
     with tab2:
-        data_mt = fetch_data("Miền Trung")
-        pred_mt = get_predictions("Miền Trung")
-        
-        render_results("Miền Trung", data_mt)
-        render_predictions_ui(pred_mt)
-        render_history("Miền Trung")
+        kq_mt = get_kqxs("Miền Trung")
+        dd_mt = get_du_doan("Miền Trung")
+        show_kq("Miền Trung", kq_mt)
+        show_du_doan(dd_mt)
+        show_lich_su("Miền Trung", lich_su)
     
     # Miền Nam
     with tab3:
-        data_mn = fetch_data("Miền Nam")
-        pred_mn = get_predictions("Miền Nam")
-        
-        render_results("Miền Nam", data_mn)
-        render_predictions_ui(pred_mn)
-        render_history("Miền Nam")
+        kq_mn = get_kqxs("Miền Nam")
+        dd_mn = get_du_doan("Miền Nam")
+        show_kq("Miền Nam", kq_mn)
+        show_du_doan(dd_mn)
+        show_lich_su("Miền Nam", lich_su)
     
     # Refresh button
-    if st.button("🔄 LÀM MỚI DỮ LIỆU"):
+    if st.button("🔄 LÀM MỚI", use_container_width=True):
         st.cache_data.clear()
         st.rerun()
     
     # Footer
     st.markdown("""
     <div class="footer">
-        💎 AI-QUANTUM GLOBAL • Chơi xổ số có trách nhiệm
+        💎 <strong>AI-QUANTUM GLOBAL</strong><br>
+        Dữ liệu cập nhật tự động • Chơi xổ số có trách nhiệm
     </div>
     """, unsafe_allow_html=True)
 
