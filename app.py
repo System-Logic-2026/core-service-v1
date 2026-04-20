@@ -38,7 +38,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # --- TIÊU ĐỀ LUXURY ---
-st.markdown("<h1 class='gold-header'>💎 AI-QUANTUM 2026: HỆ THỐNG DỰ ĐOÁN CAO CẤP</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='gold-header'>💎 AI-QUANTUM 2026 </h1>", unsafe_allow_html=True)
 st.markdown(f"<p style='text-align: center; color: #B8860B;'><i>Dữ liệu Hoàng Gia - Cập nhật lúc: {datetime.now().strftime('%H:%M:%S')}</i></p>", unsafe_allow_html=True)
 
 # --- PHẦN 1: KẾT QUẢ XS MIỀN BẮC ---
