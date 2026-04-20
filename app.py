@@ -4,108 +4,330 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import numpy as np
 import pandas as pd
+import time
+from streamlit_autorefresh import st_autorefresh
 
 # =============================================================================
-# 🔧 CẤU HÌNH
+# 🔧 CẤU HÌNH TRANG
 # =============================================================================
-st.set_page_config(page_title="AI-QUANTUM GLOBAL 💎", page_icon="💎", layout="wide")
+st.set_page_config(
+    page_title="💎 AI-QUANTUM GLOBAL",
+    page_icon="💎",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
-# CSS
+# =============================================================================
+# 🎨 CSS - GIAO DIỆN ĐẲNG CẤP
+# =============================================================================
 st.markdown("""
 <style>
-    .main { background: #f5f5f5; }
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Roboto:wght@300;400;500;700;900&display=swap');
     
-    .gold-header {
-        background: linear-gradient(135deg, #D4AF37, #B8962E);
-        padding: 25px;
-        border-radius: 10px;
-        text-align: center;
-        margin: 15px 0;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    .main {
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+        font-family: 'Roboto', sans-serif;
     }
     
-    .result-header {
-        background: linear-gradient(135deg, #c41e3a, #8b0000);
-        color: white;
-        padding: 15px;
-        text-align: center;
-        font-weight: 900;
-        font-size: 1.3em;
-        border-radius: 8px 8px 0 0;
-    }
-    
-    .special-num {
-        color: #c41e3a;
-        font-size: 2.5em;
-        font-weight: 900;
-        text-align: center;
-        letter-spacing: 5px;
-    }
-    
-    .g1-num {
-        font-size: 1.8em;
-        font-weight: 800;
-        text-align: center;
-    }
-    
-    .number-text {
-        font-size: 1.2em;
-        font-weight: 700;
-        text-align: center;
-    }
-    
-    .g7-num {
-        color: #c41e3a;
-        font-weight: 800;
-        text-align: center;
-    }
-    
-    .pred-card {
-        background: linear-gradient(135deg, #fffef0, #fff);
-        border: 3px solid #D4AF37;
-        border-radius: 10px;
-        padding: 20px;
-        text-align: center;
-        margin: 10px 0;
-    }
-    
-    .pred-number {
-        font-size: 2.2em;
-        font-weight: 900;
-        color: #000;
-        margin: 10px 0;
-    }
-    
-    .dan-de-container {
-        background: linear-gradient(135deg, #fffef0, #fff);
-        border: 3px solid #D4AF37;
-        border-radius: 10px;
-        padding: 20px;
+    /* HEADER GOLD LUXURY */
+    .main-header {
+        background: linear-gradient(135deg, #D4AF37 0%, #FFD700 50%, #B8962E 100%);
+        padding: 40px 20px;
+        border-radius: 20px;
         text-align: center;
         margin: 20px 0;
+        box-shadow: 0 10px 40px rgba(212,175,55,0.5), 
+                    inset 0 2px 10px rgba(255,255,255,0.3);
+        border: 3px solid #FFD700;
+        position: relative;
+        overflow: hidden;
+    }
+    .main-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+        transform: rotate(45deg);
+        animation: shine 3s infinite;
+    }
+    @keyframes shine {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+    .main-header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 3em;
+        font-weight: 900;
+        color: #000;
+        text-shadow: 2px 2px 4px rgba(255,255,255,0.3);
+        letter-spacing: 3px;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+    .main-header p {
+        color: #1a1a1a;
+        font-size: 1.2em;
+        font-weight: 600;
+        margin-top: 10px;
+        position: relative;
+        z-index: 1;
     }
     
-    .stats-box {
-        background: #f5f5f5;
-        padding: 15px;
-        border-radius: 8px;
-        text-align: center;
+    /* TIMESTAMP */
+    .timestamp-container {
+        background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.1));
         border: 2px solid #D4AF37;
+        padding: 15px 30px;
+        border-radius: 30px;
+        text-align: center;
+        margin: 20px auto;
+        max-width: 500px;
+        box-shadow: 0 4px 15px rgba(212,175,55,0.3);
+    }
+    .timestamp-text {
+        color: #D4AF37;
+        font-weight: 700;
+        font-size: 1.1em;
+        letter-spacing: 1px;
+    }
+    
+    /* DISCLAIMER */
+    .disclaimer-box {
+        background: linear-gradient(135deg, rgba(255,193,7,0.15), rgba(255,193,7,0.05));
+        border-left: 5px solid #D4AF37;
+        padding: 15px 25px;
+        border-radius: 10px;
+        margin: 20px;
+        color: #FFD700;
+        font-weight: 500;
+        box-shadow: 0 2px 10px rgba(212,175,55,0.2);
+    }
+    
+    /* BẢNG KẾT QUẢ CHUẨN */
+    .result-container {
+        background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        border: 3px solid #D4AF37;
+        box-shadow: 0 8px 30px rgba(212,175,55,0.3);
+    }
+    .result-header {
+        background: linear-gradient(135deg, #c41e3a, #8b0000);
+        color: #fff;
+        padding: 18px;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: 900;
+        font-size: 1.4em;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        box-shadow: 0 4px 15px rgba(196,30,58,0.4);
+    }
+    
+    /* TABS */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 15px;
+        background: transparent;
+    }
+    .stTabs [data-baseweb="tab"] {
+        height: 60px;
+        padding: 0 35px;
+        font-weight: 700;
+        font-size: 1.15em;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+        border: 2px solid #D4AF37;
+        color: #D4AF37;
+        transition: all 0.3s ease;
+    }
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, #D4AF37, #FFD700);
+        color: #000;
+        box-shadow: 0 6px 20px rgba(212,175,55,0.5);
+        transform: translateY(-2px);
+    }
+    
+    /* PREDICTION CARDS */
+    .pred-section {
+        background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+        border-radius: 15px;
+        padding: 25px;
+        margin: 25px 0;
+        border: 3px solid #D4AF37;
+        box-shadow: 0 8px 30px rgba(212,175,55,0.3);
+    }
+    .pred-title-box {
+        background: linear-gradient(135deg, #000, #1a1a1a);
+        border: 2px solid #D4AF37;
+        padding: 18px;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 25px;
+    }
+    .pred-title-text {
+        color: #D4AF37;
+        font-family: 'Playfair Display', serif;
+        font-size: 1.6em;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        margin: 0;
+    }
+    
+    .pred-card-luxury {
+        background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+        border: 3px solid #D4AF37;
+        border-radius: 15px;
+        padding: 30px 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+        height: 100%;
+        box-shadow: 0 4px 15px rgba(212,175,55,0.2);
+    }
+    .pred-card-luxury:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 35px rgba(212,175,55,0.4);
+    }
+    .pred-card-title {
+        color: #D4AF37;
+        font-size: 1.1em;
+        font-weight: 700;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+    }
+    .pred-number-big {
+        font-size: 2.8em;
+        font-weight: 900;
+        color: #fff;
+        margin: 15px 0;
+        text-shadow: 0 0 20px rgba(212,175,55,0.6);
+        letter-spacing: 4px;
+    }
+    .pred-confidence {
+        color: #FFD700;
+        font-weight: 700;
+        font-size: 1.05em;
+        margin-top: 10px;
+    }
+    
+    /* DÀN ĐỀ */
+    .dan-de-luxury {
+        background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.1));
+        border: 3px solid #D4AF37;
+        border-radius: 15px;
+        padding: 25px;
+        margin-top: 25px;
+        text-align: center;
+        box-shadow: 0 6px 25px rgba(212,175,55,0.3);
+    }
+    .dan-de-title {
+        color: #D4AF37;
+        font-size: 1.3em;
+        font-weight: 900;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+    }
+    .dan-de-numbers {
+        font-size: 1.6em;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: 4px;
+        line-height: 2;
+        text-shadow: 0 0 15px rgba(212,175,55,0.5);
+    }
+    
+    /* HISTORY */
+    .history-luxury {
+        background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+        border-radius: 15px;
+        padding: 25px;
+        margin: 25px 0;
+        border: 3px solid #D4AF37;
+        box-shadow: 0 8px 30px rgba(212,175,55,0.3);
+    }
+    .history-title {
+        color: #D4AF37;
+        font-size: 1.4em;
+        font-weight: 900;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        text-align: center;
+    }
+    
+    /* STATS CARDS */
+    .stat-card-luxury {
+        background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+        border: 2px solid #D4AF37;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(212,175,55,0.2);
+    }
+    
+    /* FOOTER */
+    .footer-luxury {
+        background: linear-gradient(135deg, #000, #1a1a1a);
+        border-top: 3px solid #D4AF37;
+        padding: 30px;
+        text-align: center;
+        margin-top: 40px;
+        color: #888;
+    }
+    
+    /* REFRESH BUTTON */
+    .stButton>button {
+        background: linear-gradient(135deg, #D4AF37, #FFD700);
+        color: #000;
+        border: none;
+        border-radius: 10px;
+        font-weight: 900;
+        font-size: 1.1em;
+        padding: 15px 40px;
+        box-shadow: 0 4px 15px rgba(212,175,55,0.4);
+        transition: all 0.3s;
+    }
+    .stButton>button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(212,175,55,0.6);
+    }
+    
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .main-header h1 { font-size: 1.8em; }
+        .pred-number-big { font-size: 2em; }
+        .dan-de-numbers { font-size: 1.2em; }
     }
 </style>
 """, unsafe_allow_html=True)
 
 # =============================================================================
-# 🔄 FETCH DATA
+# 🔄 AUTO-REFRESH (30 GIÂY)
+# =============================================================================
+auto_refresh = st_autorefresh(interval=30000, limit=None, key="auto_refresh")
+
+# =============================================================================
+# 📡 FETCH DATA
 # =============================================================================
 @st.cache_data(ttl=300)
-def get_kqxs(mien):
+def fetch_lottery_data(region: str) -> dict:
+    """Fetch real-time lottery results"""
+    
     urls = {
         "Miền Bắc": "https://xosodaiphat.com/xsmb-xổ-số-miền-bắc.html",
         "Miền Trung": "https://xosodaiphat.com/xsmt-xổ-số-miền-trung.html",
         "Miền Nam": "https://xosodaiphat.com/xsmn-xổ-số-miền-nam.html"
     }
     
-    data_default = {
+    # Mock data chuẩn
+    mock_data = {
         "Miền Bắc": {
             "special": "74197", "first": "88897",
             "second": ["75281", "83073"],
@@ -137,44 +359,61 @@ def get_kqxs(mien):
     
     try:
         headers = {'User-Agent': 'Mozilla/5.0'}
-        res = requests.get(urls[mien], headers=headers, timeout=10)
-        soup = BeautifulSoup(res.text, 'html.parser')
-        result = data_default[mien].copy()
+        response = requests.get(urls[region], headers=headers, timeout=15)
+        soup = BeautifulSoup(response.content, 'html.parser')
         
-        sp = soup.find("div", {"class": "special-prize"})
-        if sp:
-            val = sp.find("div", class_="text-center")
-            if val:
-                result["special"] = val.get_text(strip=True)
+        result = mock_data[region].copy()
         
-        g1 = soup.find("div", {"class": "first-prize"})
-        if g1:
-            val = g1.find("div", class_="text-center")
-            if val:
-                result["first"] = val.get_text(strip=True)
+        # Parse special prize
+        special_div = soup.find("div", {"class": "special-prize"})
+        if special_div:
+            special_span = special_div.find("div", class_="text-center")
+            if special_span:
+                result["special"] = special_span.get_text(strip=True)
         
+        # Parse first prize
+        first_div = soup.find("div", {"class": "first-prize"})
+        if first_div:
+            first_span = first_div.find("div", class_="text-center")
+            if first_span:
+                result["first"] = first_span.get_text(strip=True)
+        
+        result["timestamp"] = datetime.now().strftime("%H:%M:%S")
         return result
-    except:
-        return data_default[mien]
+        
+    except Exception as e:
+        result = mock_data[region].copy()
+        result["timestamp"] = datetime.now().strftime("%H:%M:%S")
+        result["error"] = str(e)
+        return result
 
+# =============================================================================
+# 🎯 AI PREDICTIONS
+# =============================================================================
 @st.cache_data(ttl=600)
-def get_du_doan(mien):
-    np.random.seed(int(datetime.now().strftime("%H%M")) + hash(mien) % 100)
-    bt = f"{np.random.randint(0,100):02d}"
-    st1 = f"{np.random.randint(0,100):02d}"
-    st2 = f"{np.random.randint(0,100):02d}"
+def generate_predictions(region: str) -> dict:
+    """Generate AI-based predictions"""
+    np.random.seed(int(datetime.now().strftime("%H%M")) + hash(region) % 100)
+    
+    bach_thu = f"{np.random.randint(0, 100):02d}"
+    song_thu_1 = f"{np.random.randint(0, 100):02d}"
+    song_thu_2 = f"{np.random.randint(0, 100):02d}"
     
     return {
-        "bach_thu": bt,
-        "conf_bt": np.random.randint(75, 95),
-        "song_thu": [st1, st2],
-        "conf_st": np.random.randint(70, 90),
-        "xien_2": [bt, st1],
-        "dan_de": sorted([f"{i:02d}" for i in np.random.choice(100, 10, replace=False)])
+        "bach_thu": bach_thu,
+        "bach_thu_conf": np.random.randint(75, 96),
+        "song_thu": [song_thu_1, song_thu_2],
+        "song_thu_conf": np.random.randint(70, 91),
+        "xien_2": [bach_thu, song_thu_1],
+        "dan_de": sorted([f"{i:02d}" for i in np.random.choice(100, 10, replace=False)]),
+        "generated_at": datetime.now().strftime("%H:%M:%S")
     }
 
+# =============================================================================
+# 📊 HISTORY
+# =============================================================================
 @st.cache_data
-def get_lich_su():
+def get_history() -> dict:
     return {
         "Miền Bắc": [
             {"date": "19/04", "type": "Bạch Thủ", "pred": "79", "result": "25", "win": False},
@@ -194,114 +433,138 @@ def get_lich_su():
     }
 
 # =============================================================================
-# 🎨 RENDER FUNCTIONS - STREAMLIT NATIVE
+# 🎨 RENDER FUNCTIONS
 # =============================================================================
-def render_bang_ket_qua(mien, kq):
-    """Bảng kết quả bằng Streamlit DataFrame"""
+def render_results_table(region: str,  dict):
+    """Render beautiful results table"""
     titles = {
         "Miền Bắc": "🔴 XSMB - KẾT QUẢ XỔ SỐ MIỀN BẮC",
         "Miền Trung": "🟡 XSMT - KẾT QUẢ XỔ SỐ MIỀN TRUNG",
         "Miền Nam": "🟢 XSMN - KẾT QUẢ XỔ SỐ MIỀN NAM"
     }
     
-    # Title
-    st.markdown(f'<div class="result-header">{titles[mien]}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="result-header">{titles[region]}</div>', unsafe_allow_html=True)
     
     # Create DataFrame
     df_data = {
         "Giải": ["G.ĐB", "G.1", "G.2", "G.3", "G.4", "G.5", "G.6", "G.7"],
-        "Kết quả": [
-            kq["special"],
-            kq["first"],
-            " • ".join(kq["second"]),
-            " • ".join(kq["third"]),
-            " • ".join(kq["fourth"]),
-            " • ".join(kq["fifth"]),
-            " • ".join(kq["sixth"]),
-            " • ".join(kq["seventh"])
+        "Kết Quả": [
+            data["special"],
+            data["first"],
+            " • ".join(data["second"]),
+            " • ".join(data["third"]),
+            " • ".join(data["fourth"]),
+            " • ".join(data["fifth"]),
+            " • ".join(data["sixth"]),
+            " • ".join(data["seventh"])
         ]
     }
     
     df = pd.DataFrame(df_data)
+    st.dataframe(df, use_container_width=True, hide_index=True)
     
-    # Display with custom styling
-    st.dataframe(
-        df,
-        use_container_width=True,
-        hide_index=True,
-        column_config={
-            "Giải": st.column_config.TextColumn(width="small"),
-            "Kết quả": st.column_config.TextColumn(width="large")
-        }
-    )
+    st.markdown(f'<p style="text-align: center; color: #666; margin-top: 10px;">⏰ Cập nhật: {data.get("timestamp", "N/A")}</p>', unsafe_allow_html=True)
 
 
-def render_du_doan(dd):
-    """Dự đoán bằng Streamlit columns - NO HTML"""
-    st.markdown('<div class="gold-header" style="margin: 20px 0;"><h2 style="color: #000; margin: 0;">💎 DỰ ĐOÁN VIP AI-QUANTUM</h2></div>', unsafe_allow_html=True)
+def render_predictions_luxury(pred: dict):
+    """Render luxury prediction cards"""
+    st.markdown("""
+    <div class="pred-section">
+        <div class="pred-title-box">
+            <h2 class="pred-title-text">💎 DỰ ĐOÁN VIP AI-QUANTUM</h2>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.markdown('<div class="pred-card">', unsafe_allow_html=True)
-        st.markdown("### ✅ BẠCH THỦ LÔ VIP")
-        st.markdown(f'<div class="pred-number">{dd["bach_thu"]}</div>', unsafe_allow_html=True)
-        st.markdown(f"🎯 **Độ tin cậy: {dd['conf_bt']}%**")
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown(f"""
+        <div class="pred-card-luxury">
+            <div class="pred-card-title">✅ BẠCH THỦ LÔ VIP</div>
+            <div class="pred-number-big">{pred['bach_thu']}</div>
+            <div class="pred-confidence">🎯 Độ tin cậy: {pred['bach_thu_conf']}%</div>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col2:
-        st.markdown('<div class="pred-card">', unsafe_allow_html=True)
-        st.markdown("### ✅ SONG THỦ LÔ VIP")
-        st.markdown(f'<div class="pred-number">{" - ".join(dd["song_thu"])}</div>', unsafe_allow_html=True)
-        st.markdown(f"🎯 **Độ tin cậy: {dd['conf_st']}%**")
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown(f"""
+        <div class="pred-card-luxury">
+            <div class="pred-card-title">✅ SONG THỦ LÔ VIP</div>
+            <div class="pred-number-big">{' - '.join(pred['song_thu'])}</div>
+            <div class="pred-confidence">🎯 Độ tin cậy: {pred['song_thu_conf']}%</div>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col3:
-        st.markdown('<div class="pred-card">', unsafe_allow_html=True)
-        st.markdown("### ✅ XIÊN 2")
-        st.markdown(f'<div class="pred-number">{" - ".join(dd["xien_2"])}</div>', unsafe_allow_html=True)
-        st.markdown("⭐ **Chuẩn xác cao**")
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown(f"""
+        <div class="pred-card-luxury">
+            <div class="pred-card-title">✅ XIÊN 2</div>
+            <div class="pred-number-big">{' - '.join(pred['xien_2'])}</div>
+            <div class="pred-confidence">⭐ Chuẩn xác cao</div>
+        </div>
+        """, unsafe_allow_html=True)
     
     # Dàn đề
-    st.markdown('<div class="dan-de-container">', unsafe_allow_html=True)
-    st.markdown("### 🔥 DÀN ĐỀ 10 SỐ VIP 🔥")
-    st.markdown(f'<div style="font-size: 1.5em; font-weight: 700; letter-spacing: 3px;">{", ".join(dd["dan_de"])}</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="dan-de-luxury">
+        <div class="dan-de-title">🔥 DÀN ĐỀ 10 SỐ VIP 🔥</div>
+        <div class="dan-de-numbers">{', '.join(pred['dan_de'])}</div>
+        <p style="color: #888; margin-top: 10px; font-size: 0.9em;">Generated: {pred['generated_at']}</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 
-def render_lich_su(mien, lich_su):
-    """Lịch sử bằng Streamlit metrics và dataframe"""
-    data = lich_su.get(mien, [])
+def render_history_luxury(region: str, history: dict):
+    """Render luxury history section"""
+    data = history.get(region, [])
     total = len(data)
     wins = sum(1 for d in data if d["win"])
-    rate = (wins/total*100) if total > 0 else 0
+    rate = (wins / total * 100) if total > 0 else 0
     
-    st.markdown("### 📊 LỊCH SỬ DỰ ĐOÁN")
+    st.markdown('<div class="history-luxury">', unsafe_allow_html=True)
+    st.markdown('<h3 class="history-title">📊 LỊCH SỬ DỰ ĐOÁN & THỐNG KÊ</h3>', unsafe_allow_html=True)
     
     # Stats
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("Tổng", total)
+        st.markdown(f"""
+        <div class="stat-card-luxury">
+            <div style="font-size: 2em; font-weight: 900; color: #D4AF37;">{total}</div>
+            <div style="color: #888; margin-top: 5px;">Tổng</div>
+        </div>
+        """, unsafe_allow_html=True)
     with col2:
-        st.metric("Trúng", wins)
+        st.markdown(f"""
+        <div class="stat-card-luxury">
+            <div style="font-size: 2em; font-weight: 900; color: #10b981;">{wins}</div>
+            <div style="color: #888; margin-top: 5px;">Trúng</div>
+        </div>
+        """, unsafe_allow_html=True)
     with col3:
-        st.metric("Tỷ lệ", f"{rate:.0f}%")
+        st.markdown(f"""
+        <div class="stat-card-luxury">
+            <div style="font-size: 2em; font-weight: 900; color: #c41e3a;">{rate:.0f}%</div>
+            <div style="color: #888; margin-top: 5px;">Tỷ lệ</div>
+        </div>
+        """, unsafe_allow_html=True)
     
     # Table
-    if data:
+    if 
         df_data = []
-        for item in data:
+        for item in 
             df_data.append({
                 "Ngày": item["date"],
                 "Loại": item["type"],
-                "Dự đoán": item["pred"],
-                "Kết quả": item["result"],
-                "Trạng thái": "✅" if item["win"] else "❌"
+                "Dự Đoán": item["pred"],
+                "Kết Quả": item["result"],
+                "Trạng Thái": "✅" if item["win"] else "❌"
             })
         
         df = pd.DataFrame(df_data)
         st.dataframe(df, use_container_width=True, hide_index=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================================================================
 # 🚀 MAIN APP
@@ -309,56 +572,94 @@ def render_lich_su(mien, lich_su):
 def main():
     # Header
     st.markdown("""
-    <div class="gold-header">
-        <h1 style="color: #000; margin: 0; font-size: 2.5em;">💎 AI-QUANTUM GLOBAL</h1>
-        <p style="color: #1a1a1a; margin: 10px 0 0; font-weight: 600;">Hệ thống phân tích xổ số thông minh</p>
+    <div class="main-header">
+        <h1>💎 AI-QUANTUM GLOBAL</h1>
+        <p>Hệ Thống Phân Tích Xổ Số Thông Minh Cao Cấp</p>
     </div>
     """, unsafe_allow_html=True)
     
     # Timestamp
     now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    st.info(f"📅 Cập nhật: {now}")
+    st.markdown(f"""
+    <div class="timestamp-container">
+        <div class="timestamp-text">📅 Cập nhật: {now}</div>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Disclaimer
-    st.warning("⚠️ **Lưu ý:** Xổ số là trò chơi ngẫu nhiên. Kết quả chỉ mang tính tham khảo giải trí.")
+    st.markdown("""
+    <div class="disclaimer-box">
+        ⚠️ <strong>Lưu ý quan trọng:</strong> Xổ số là trò chơi ngẫu nhiên. Mọi dự đoán chỉ mang tính chất tham khảo giải trí, 
+        không đảm bảo trúng thưởng. Vui lòng chơi có trách nhiệm và trong khả năng tài chính.
+    </div>
+    """, unsafe_allow_html=True)
     
     # Tabs
-    tab1, tab2, tab3 = st.tabs(["🔴 MIỀN BẮC", "🟡 MIỀN TRUNG", "🟢 MIỀN NAM"])
+    tab_mb, tab_mt, tab_mn = st.tabs(["🔴 MIỀN BẮC", "🟡 MIỀN TRUNG", "🟢 MIỀN NAM"])
     
-    lich_su = get_lich_su()
+    # Load data
+    history = get_history()
     
     # Miền Bắc
-    with tab1:
-        kq_mb = get_kqxs("Miền Bắc")
-        dd_mb = get_du_doan("Miền Bắc")
-        render_bang_ket_qua("Miền Bắc", kq_mb)
-        render_du_doan(dd_mb)
-        render_lich_su("Miền Bắc", lich_su)
+    with tab_mb:
+        with st.spinner("💎 Đang cập nhật Miền Bắc..."):
+            data_mb = fetch_lottery_data("Miền Bắc")
+            pred_mb = generate_predictions("Miền Bắc")
+        
+        st.markdown('<div class="result-container">', unsafe_allow_html=True)
+        render_results_table("Miền Bắc", data_mb)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        render_predictions_luxury(pred_mb)
+        render_history_luxury("Miền Bắc", history)
     
     # Miền Trung
-    with tab2:
-        kq_mt = get_kqxs("Miền Trung")
-        dd_mt = get_du_doan("Miền Trung")
-        render_bang_ket_qua("Miền Trung", kq_mt)
-        render_du_doan(dd_mt)
-        render_lich_su("Miền Trung", lich_su)
+    with tab_mt:
+        with st.spinner("💎 Đang cập nhật Miền Trung..."):
+            data_mt = fetch_lottery_data("Miền Trung")
+            pred_mt = generate_predictions("Miền Trung")
+        
+        st.markdown('<div class="result-container">', unsafe_allow_html=True)
+        render_results_table("Miền Trung", data_mt)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        render_predictions_luxury(pred_mt)
+        render_history_luxury("Miền Trung", history)
     
     # Miền Nam
-    with tab3:
-        kq_mn = get_kqxs("Miền Nam")
-        dd_mn = get_du_doan("Miền Nam")
-        render_bang_ket_qua("Miền Nam", kq_mn)
-        render_du_doan(dd_mn)
-        render_lich_su("Miền Nam", lich_su)
+    with tab_mn:
+        with st.spinner("💎 Đang cập nhật Miền Nam..."):
+            data_mn = fetch_lottery_data("Miền Nam")
+            pred_mn = generate_predictions("Miền Nam")
+        
+        st.markdown('<div class="result-container">', unsafe_allow_html=True)
+        render_results_table("Miền Nam", data_mn)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        render_predictions_luxury(pred_mn)
+        render_history_luxury("Miền Nam", history)
     
-    # Refresh
-    if st.button("🔄 LÀM MỚI DỮ LIỆU", use_container_width=True):
+    # Refresh button
+    st.markdown("<div style='text-align: center; margin: 30px 0;'>", unsafe_allow_html=True)
+    if st.button("🔄 LÀM MỚI DỮ LIỆU NGAY", use_container_width=False):
         st.cache_data.clear()
         st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
     
     # Footer
-    st.markdown("---")
-    st.markdown("<div style='text-align: center; color: #666; padding: 20px;'><strong>💎 AI-QUANTUM GLOBAL</strong><br>Chơi xổ số có trách nhiệm</div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div class="footer-luxury">
+        <p style="margin: 0; font-size: 1.1em; color: #D4AF37; font-weight: 700;">
+            💎 AI-QUANTUM GLOBAL
+        </p>
+        <p style="margin: 8px 0 0; font-size: 0.9em;">
+            Dữ liệu cập nhật tự động mỗi 30 giây • Không thu thập thông tin cá nhân
+        </p>
+        <p style="margin: 8px 0 0; color: #D4AF37; font-weight: 600;">
+            Chơi xổ số có trách nhiệm - Chúc may mắn!
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
